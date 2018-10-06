@@ -68,6 +68,12 @@ for i in range(iteration):
 
 
 print "b: %f, w: %f" % (b, w)
+loss = 0.0
+for i in range(len(x_data)):
+	loss = loss + ((y_data[n] - b - w * x_data[n]) ** 2)
+print "Loss: %f" % (loss ** 0.5)
+# loss = 511.633793
+
 #plot the figure
 plt.contourf(x, y, Z, 50, alpha = 0.5, cmap = plt.get_cmap('jet'))
 plt.plot([-188.4], [2.67], 'x', ms = 12, markeredgewidth = 3, color = 'orange')
