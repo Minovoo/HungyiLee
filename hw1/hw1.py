@@ -79,6 +79,8 @@ for i in range(iterator):
 	print ('iterator: %d | Cost: %f') % (i, cost_a)
 
 
+
+
 # save model
 np.save('model', w)
 
@@ -131,15 +133,22 @@ for i in range(len(ans)):
 text.close()
 
 
+fileObject = open('result/hw1_w.txt', 'w')  
+for ip in w:  
+    fileObject.write(str(ip))  
+    fileObject.write('\n')  
+fileObject.close()  
 
 
 
 
 
+def getW():
+	return w
 
 
-
-
+def getX():
+	return test_x
 
 
 
