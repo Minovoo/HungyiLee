@@ -21,28 +21,29 @@ def load_data(train_data_path, train_label_path, test_data_path):
 	Y_train = pd.read_csv(train_label_path, sep = ',', header = 0)
 	X_test = pd.read_csv(test_data_path, sep = ',', header = 0)
 
-	X_train = _discrete(X_train)
-	X_test = _discrete(X_test)
+	# drop the income column in train data
+	X_train.drop('income', axis = 1, inplace = True)
 
+	# concatenate X_train and X_test to discrete 
+	train = pd.concat([X_train, X_test], ignore_index = True)
+	train = _discrete(train)
+	X_train = train[:len(X_train)]
+	X_test = train[len(X_train):]
+
+	# to be array
 	Y_train = np.array(Y_train.values)
 	Y_train = Y_train[:, -1]
-
 	X_train = np.array(X_train.values)
-	X_train = X_train[:,:-1]
+	X_test = np.array(X_test.values)
 
 	for i in range(len(Y_train)):
 		if ('>' in Y_train[i]):
 			Y_train[i] = int(1)
 		else:
 			Y_train[i] = int(0)
-
-
 	
-	X_test = np.array(X_test.values)
-
-
-
 	return (X_train, Y_train, X_test)
+
 
 
 
@@ -87,7 +88,7 @@ def split_valid_set(X_all, Y_all, percentage):
 
 	X_all, Y_all = _shuffle(X_all, Y_all)
 
-	x_train, Y_train = X_all[0:valid_data_size], Y_all[0:valid_data_size]
+	X_train, Y_train = X_all[0:valid_data_size], Y_all[0:valid_data_size]
 	X_valid, Y_valid = X_all[valid_data_size:], Y_all[valid_data_size:]
 
 	return X_train, Y_train, X_valid, Y_valid
@@ -95,6 +96,8 @@ def split_valid_set(X_all, Y_all, percentage):
 
 # define sigmoid 
 def sigmoid(z):
+	# must have this step.
+	z = z.astype(float)
 	res = 1 / (1.0 + np.exp(-z))
 	return np.clip(res, 1e-8, 1 - (1e-8))
 
@@ -102,12 +105,12 @@ def sigmoid(z):
 # get valid score
 def valid(w, b, X_valid, Y_valid):
 	valid_data_size = len(X_valid)
-
 	z = (np.dot(X_valid, np.transpose(w)) + b)
 	y = sigmoid(z)
 	y_ = np.around(y)
 	result = (np.squeeze(Y_valid) == y_)
-	print('Vlidation accuracy = %f' % (float(result.sum()) / valid_data_size))
+	print('Validation acc = %f' % (float(result.sum()) / valid_data_size))
+
 	return
 
 
@@ -118,7 +121,7 @@ def train(X_all, Y_all, save_dir):
 	X_train, Y_train, X_valid, Y_valid = split_valid_set(X_all, Y_all, valid_set_percentage)
 
 	# Initiallize parameter, hyperparameter
-	w = np.zeros((106, ))
+	w = np.zeros((14, ))
 	b = np.zeros((1, ))
 	l_rate = 0.1
 	batch_size = 32
